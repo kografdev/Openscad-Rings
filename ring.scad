@@ -16,13 +16,15 @@ max_offset = max_height/2-rounding_radius;
 min_offset = min_height/2-rounding_radius;
 growing_offset = growing_height/2;
 
-stop_angle = 2*asin(faceplate_width/2/ring_offset);
+stepsize_default = 360/$fn;
+
+stop_angle = 2*asin((faceplate_width/2)/sqrt(ring_offset^2+(faceplate_width/2)^2));
 growing_ratio = (180-stop_angle)/180;
-stepsize_growing = (360-2*stop_angle)/$fn;
+stepsize_growing = (180-stop_angle)/ceil((180-stop_angle)/stepsize_default);
 startstep_growing = -180+stop_angle;
 laststep_growing = 180-stop_angle-stepsize_growing;
 
-stepsize_faceplate = stop_angle*2/$fn;
+stepsize_faceplate = stop_angle/ceil(stop_angle/stepsize_default);
 startstep_faceplate_half_1 = 180-stop_angle;
 stopstep_faceplate_half_1 = 180-stepsize_faceplate;
 startstep_faceplate_half_2 = 180;
