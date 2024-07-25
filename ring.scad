@@ -26,9 +26,9 @@ laststep_growing = 180-stop_angle-stepsize_growing;
 
 stepsize_faceplate = stop_angle/ceil(stop_angle/stepsize_default);
 startstep_faceplate_half_1 = 180-stop_angle;
-stopstep_faceplate_half_1 = 180-stepsize_faceplate;
+stopstep_faceplate_half_1 = 180-stepsize_faceplate/2;
 startstep_faceplate_half_2 = 180;
-stopstep_faceplate_half_2 = 180+stop_angle-stepsize_faceplate;
+stopstep_faceplate_half_2 = 180+stop_angle-stepsize_faceplate/2;
 
 faceplate_position_x = cos(startstep_faceplate_half_2)*ring_offset;
 faceplate_position_y = sin(startstep_faceplate_half_2)*ring_offset;
