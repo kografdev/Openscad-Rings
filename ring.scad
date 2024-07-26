@@ -1,14 +1,22 @@
-inner_diamter = 20;
+ring = "growing_faceplate";
+
+inner_diameter = 20;
 thickness = 1;
 min_height = 5;
 max_height = 10;
 faceplate_width = 10;
 
-$fn = $preview ? 20: 100;
+fn_segments_preview = 50;
+fn_segments_render = 200;
+fn_rounding_preview = 20;
+fn_rounding_render = 50;
+
+$fn = $preview ? fn_rounding_preview: fn_rounding_render;
+fn_segments = $preview ? fn_segments_preview : fn_segments_render;
 
 
 rounding_radius = thickness/2;
-inner_radius = inner_diamter/2;
+inner_radius = inner_diameter/2;
 ring_offset = inner_radius+rounding_radius;
 
 growing_height = max_height-min_height;
@@ -16,7 +24,7 @@ max_offset = max_height/2-rounding_radius;
 min_offset = min_height/2-rounding_radius;
 growing_offset = growing_height/2;
 
-stepsize_default = 360/$fn;
+stepsize_default = 360/fn_segments;
 
 stop_angle = 2*asin((faceplate_width/2)/sqrt(ring_offset^2+(faceplate_width/2)^2));
 growing_ratio = (180-stop_angle)/180;
@@ -37,56 +45,71 @@ faceplate_offset = faceplate_width/2-rounding_radius;
 faceplate_offset_half_1 = faceplate_offset;
 faceplate_offset_half_2 = -faceplate_offset;
 
-union(){
+module growing_faceplate_ring(){
     union(){
-	for(i=[startstep_growing:stepsize_growing:laststep_growing]){
-	    hull(){
-		translate([cos(i)*ring_offset, sin(i)*ring_offset, min_offset+(cos((i-startstep_growing)/growing_ratio)+1)/2*growing_offset])
-		sphere(r=rounding_radius);
-		translate([cos(i)*ring_offset, sin(i)*ring_offset, -min_offset-(cos((i-startstep_growing)/growing_ratio)+1)/2*growing_offset])
-		sphere(r=rounding_radius);
-		translate([cos(i+stepsize_growing)*ring_offset, sin(i+stepsize_growing)*ring_offset, min_offset+(cos((i+stepsize_growing-startstep_growing)/growing_ratio)+1)/2*growing_offset])
-		sphere(r=rounding_radius);
-		translate([cos(i+stepsize_growing)*ring_offset, sin(i+stepsize_growing)*ring_offset, -min_offset-(cos((i+stepsize_growing-startstep_growing)/growing_ratio)+1)/2*growing_offset])
-		sphere(r=rounding_radius);
+	union(){
+	    for(i=[startstep_growing:stepsize_growing:laststep_growing]){
+		hull(){
+		    translate([cos(i)*ring_offset, sin(i)*ring_offset, min_offset+(cos((i-startstep_growing)/growing_ratio)+1)/2*growing_offset])
+		    sphere(r=rounding_radius);
+		    translate([cos(i)*ring_offset, sin(i)*ring_offset, -min_offset-(cos((i-startstep_growing)/growing_ratio)+1)/2*growing_offset])
+		    sphere(r=rounding_radius);
+		    translate([cos(i+stepsize_growing)*ring_offset, sin(i+stepsize_growing)*ring_offset, min_offset+(cos((i+stepsize_growing-startstep_growing)/growing_ratio)+1)/2*growing_offset])
+		    sphere(r=rounding_radius);
+		    translate([cos(i+stepsize_growing)*ring_offset, sin(i+stepsize_growing)*ring_offset, -min_offset-(cos((i+stepsize_growing-startstep_growing)/growing_ratio)+1)/2*growing_offset])
+		    sphere(r=rounding_radius);
+		}
 	    }
 	}
-    }
-    union(){
-	for(i=[startstep_faceplate_half_1:stepsize_faceplate:stopstep_faceplate_half_1]){
-	    hull(){
-		translate([cos(i)*ring_offset, sin(i)*ring_offset, max_offset])
-		sphere(r=rounding_radius);
-		translate([cos(i)*ring_offset, sin(i)*ring_offset, -max_offset])
-		sphere(r=rounding_radius);
-		translate([cos(i+stepsize_faceplate)*ring_offset, sin(i+stepsize_faceplate)*ring_offset, max_offset])
-		sphere(r=rounding_radius);
-		translate([cos(i+stepsize_faceplate)*ring_offset, sin(i+stepsize_faceplate)*ring_offset, -max_offset])
-		sphere(r=rounding_radius);
-		translate([faceplate_position_x, faceplate_position_y+faceplate_offset_half_1, max_offset])
-		sphere(r=rounding_radius);
-		translate([faceplate_position_x, faceplate_position_y+faceplate_offset_half_1, -max_offset])
-		sphere(r=rounding_radius);
+	union(){
+	    for(i=[startstep_faceplate_half_1:stepsize_faceplate:stopstep_faceplate_half_1]){
+		hull(){
+		    translate([cos(i)*ring_offset, sin(i)*ring_offset, max_offset])
+		    sphere(r=rounding_radius);
+		    translate([cos(i)*ring_offset, sin(i)*ring_offset, -max_offset])
+		    sphere(r=rounding_radius);
+		    translate([cos(i+stepsize_faceplate)*ring_offset, sin(i+stepsize_faceplate)*ring_offset, max_offset])
+		    sphere(r=rounding_radius);
+		    translate([cos(i+stepsize_faceplate)*ring_offset, sin(i+stepsize_faceplate)*ring_offset, -max_offset])
+		    sphere(r=rounding_radius);
+		    translate([faceplate_position_x, faceplate_position_y+faceplate_offset_half_1, max_offset])
+		    sphere(r=rounding_radius);
+		    translate([faceplate_position_x, faceplate_position_y+faceplate_offset_half_1, -max_offset])
+		    sphere(r=rounding_radius);
+		}
 	    }
 	}
-    }
-    union(){
-	for(i=[startstep_faceplate_half_2:stepsize_faceplate:stopstep_faceplate_half_2]){
-	    hull(){
-		translate([cos(i)*ring_offset, sin(i)*ring_offset, max_offset])
-		sphere(r=rounding_radius);
-		translate([cos(i)*ring_offset, sin(i)*ring_offset, -max_offset])
-		sphere(r=rounding_radius);
-		translate([cos(i+stepsize_faceplate)*ring_offset, sin(i+stepsize_faceplate)*ring_offset, max_offset])
-		sphere(r=rounding_radius);
-		translate([cos(i+stepsize_faceplate)*ring_offset, sin(i+stepsize_faceplate)*ring_offset, -max_offset])
-		sphere(r=rounding_radius);
-		translate([faceplate_position_x, faceplate_position_y+faceplate_offset_half_2, max_offset])
-		sphere(r=rounding_radius);
-		translate([faceplate_position_x, faceplate_position_y+faceplate_offset_half_2, -max_offset])
-		sphere(r=rounding_radius);
+	union(){
+	    for(i=[startstep_faceplate_half_2:stepsize_faceplate:stopstep_faceplate_half_2]){
+		hull(){
+		    translate([cos(i)*ring_offset, sin(i)*ring_offset, max_offset])
+		    sphere(r=rounding_radius);
+		    translate([cos(i)*ring_offset, sin(i)*ring_offset, -max_offset])
+		    sphere(r=rounding_radius);
+		    translate([cos(i+stepsize_faceplate)*ring_offset, sin(i+stepsize_faceplate)*ring_offset, max_offset])
+		    sphere(r=rounding_radius);
+		    translate([cos(i+stepsize_faceplate)*ring_offset, sin(i+stepsize_faceplate)*ring_offset, -max_offset])
+		    sphere(r=rounding_radius);
+		    translate([faceplate_position_x, faceplate_position_y+faceplate_offset_half_2, max_offset])
+		    sphere(r=rounding_radius);
+		    translate([faceplate_position_x, faceplate_position_y+faceplate_offset_half_2, -max_offset])
+		    sphere(r=rounding_radius);
+		}
 	    }
 	}
     }
 }
 
+module basic_ring(){
+    linear_extrude(max_height){
+	difference(){
+	    circle(d=inner_diameter+2*thickness, $fn=fn_segments);
+	    circle(d=inner_diameter, $fn=fn_segments);
+	}
+    }
+}
+
+if (ring == "growing_faceplate")
+    growing_faceplate_ring();
+else if (ring == "basic")
+    basic_ring();
