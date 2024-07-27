@@ -6,13 +6,19 @@ min_height = 5;
 max_height = 10;
 faceplate_width = 10;
 
+text_size_ratio = 0.8;
+text_width_ratio = 2.5;
+
 fn_segments_preview = 50;
 fn_segments_render = 200;
 fn_rounding_preview = 20;
 fn_rounding_render = 50;
+fn_text_preview = 50;
+fn_text_render = 200;
 
 $fn = $preview ? fn_rounding_preview: fn_rounding_render;
 fn_segments = $preview ? fn_segments_preview : fn_segments_render;
+fn_text = $preview ? fn_text_preview : fn_text_render;
 
 
 rounding_radius = thickness/2;
@@ -44,6 +50,12 @@ faceplate_position_y = sin(startstep_faceplate_half_2)*ring_offset;
 faceplate_offset = faceplate_width/2-rounding_radius;
 faceplate_offset_half_1 = faceplate_offset;
 faceplate_offset_half_2 = -faceplate_offset;
+
+text_size = max_height*text_size_ratio;
+text_width = text_size*text_width_ratio;
+text_depth = 0.5*thickness;
+
+outer_diameter = inner_diameter+2*thickness;
 
 module growing_faceplate_ring(){
     union(){
@@ -103,9 +115,33 @@ module growing_faceplate_ring(){
 module basic_ring(){
     linear_extrude(max_height){
 	difference(){
-	    circle(d=inner_diameter+2*thickness, $fn=fn_segments);
+	    circle(d=outer_diameter, $fn=fn_segments);
 	    circle(d=inner_diameter, $fn=fn_segments);
 	}
+    }
+}
+
+module basic_faceplate_ring(overwrite_faceplate_width=0){
+    used_faceplate_width = overwrite_faceplate_width!=0?overwrite_faceplate_width:faceplate_width;
+    linear_extrude(max_height){
+	difference(){
+	    hull(){
+		circle(d=outer_diameter, $fn=fn_segments);
+		translate([-ring_offset,0,0])
+		square([thickness, used_faceplate_width], center=true);
+	    }
+	    circle(d=inner_diameter, $fn=fn_segments);
+	}
+    }
+}
+
+module size_test_ring(){
+    difference(){
+        basic_faceplate_ring(text_width);
+        translate([-outer_diameter/2+text_depth,0,max_height/2])
+        rotate([90,0,-90])
+        linear_extrude(text_depth)
+        text(str(inner_diameter), size=text_size, $fn=fn_text, halign="center", valign="center");
     }
 }
 
@@ -113,3 +149,8 @@ if (ring == "growing_faceplate")
     growing_faceplate_ring();
 else if (ring == "basic")
     basic_ring();
+else if (ring == "basic_faceplate")
+    basic_faceplate_ring();
+else if (ring == "size_test")
+    size_test_ring();
+
