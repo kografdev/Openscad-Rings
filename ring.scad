@@ -1,25 +1,28 @@
-ring = "growing_faceplate";
+ring = "growing_faceplate"; // [growing_faceplate, basic, basic_rounded, basic_faceplate, size_test]
 
-inner_diameter = 20;
-thickness = 1;
-min_height = 5;
-max_height = 10;
-faceplate_width = 10;
+inner_diameter = 20; // [10:0.5:40]
+thickness = 1; // [0.5:0.1:3]
+min_height = 5; // [1:0.5:15]
+max_height = 10; // [1:0.5:20]
+faceplate_width = 10; //[5:1:40]
 
-text_size_ratio = 0.8;
-text_width_ratio = 2.5;
+text_size_ratio = 0.5; //[0.1:0.1:1]
+text_width_ratio = 3; //[1:0.1:4]
 
-fn_segments_preview = 50;
-fn_segments_render = 200;
-fn_rounding_preview = 20;
-fn_rounding_render = 50;
-fn_text_preview = 50;
-fn_text_render = 200;
+fn_segments_preview = 50; //[10:10:500]
+fn_segments_render = 200; //[10:10:500]
+fn_rounding_preview = 20; //[10:10:500]
+fn_rounding_render = 50; //[10:10:500]
+fn_text_preview = 50; //[10:10:500]
+fn_text_render = 200; //[10:10:500]
+
+
+module __Customizer_Limit__ () {}
+
 
 $fn = $preview ? fn_rounding_preview: fn_rounding_render;
 fn_segments = $preview ? fn_segments_preview : fn_segments_render;
 fn_text = $preview ? fn_text_preview : fn_text_render;
-
 
 rounding_radius = thickness/2;
 inner_radius = inner_diameter/2;
@@ -121,6 +124,23 @@ module basic_ring(){
     }
 }
 
+module rounded_ring(){
+    union(){
+	for(i=[0:stepsize_default:360-stepsize_default]){
+	    hull(){
+		translate([cos(i)*ring_offset, sin(i)*ring_offset, 0])
+		sphere(r=rounding_radius);
+		translate([cos(i+stepsize_default)*ring_offset, sin(i+stepsize_default)*ring_offset, 0])
+		sphere(r=rounding_radius);
+		translate([cos(i)*ring_offset, sin(i)*ring_offset, max_height])
+		sphere(r=rounding_radius);
+		translate([cos(i+stepsize_default)*ring_offset, sin(i+stepsize_default)*ring_offset, max_height])
+		sphere(r=rounding_radius);
+	    }
+	}
+    }
+}
+
 module basic_faceplate_ring(overwrite_faceplate_width=0){
     used_faceplate_width = overwrite_faceplate_width!=0?overwrite_faceplate_width:faceplate_width;
     linear_extrude(max_height){
@@ -149,6 +169,8 @@ if (ring == "growing_faceplate")
     growing_faceplate_ring();
 else if (ring == "basic")
     basic_ring();
+else if (ring == "basic_rounded")
+    rounded_ring();
 else if (ring == "basic_faceplate")
     basic_faceplate_ring();
 else if (ring == "size_test")
